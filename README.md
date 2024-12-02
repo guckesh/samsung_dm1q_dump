@@ -1,14 +1,14 @@
-# dm1qxxx-user 14 UP1A.231005.007 S911BXXS6CXI4 release-keys
+# dm1qxxx-user 14 UP1A.231005.007 S911BXXU7CXK4 release-keys
 - manufacturer: samsung
 - platform: kalama
 - codename: dm1q
 - flavor: dm1qxxx-user
 - release: 14
 - id: UP1A.231005.007
-- incremental: S911BXXS6CXI4
+- incremental: S911BXXU7CXK4
 - tags: release-keys
-- fingerprint: samsung/dm1qxxx/dm1q:13/TP1A.220624.014/S911BXXS6CXI4:user/release-keys
+- fingerprint: samsung/dm1qxxx/dm1q:13/TP1A.220624.014/S911BXXU7CXK4:user/release-keys
 - is_ab: false
 - brand: samsung
-- branch: dm1qxxx-user-14-UP1A.231005.007-S911BXXS6CXI4-release-keys
+- branch: dm1qxxx-user-14-UP1A.231005.007-S911BXXU7CXK4-release-keys
 - repo: samsung_dm1q_dump
