@@ -1,0 +1,11 @@
+service vendor.nfc_hal_service /vendor/bin/hw/android.hardware.nfc-service.nxp
+    interface aidl android.hardware.nfc.INfc/default
+    interface aidl vendor.samsung.hardware.nfc_aidl.ISehNfc/default
+    class hal
+    oneshot
+    disabled
+    user nfc
+    group nfc net_bt_admin
+
+on property:ro.vendor.nfc.feature.chipname=NXP_SN100U
+    start vendor.nfc_hal_service

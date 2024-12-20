@@ -2,9 +2,9 @@ service sec-camera-provider /vendor/bin/hw/vendor.samsung.hardware.camera.provid
     interface aidl android.hardware.camera.provider.ICameraProvider/internal/0
     class hal
     user cameraserver
-    group audio camera input drmrpc system media_rw sdcard_rw media vendor_secdir
+    group audio camera input drmrpc system media_rw sdcard_rw media vendor_secdir wakelock
     ioprio rt 4
-    capabilities SYS_NICE
+    capabilities SYS_NICE BLOCK_SUSPEND
     task_profiles HighPerformance CameraServiceCapacity
 
 on boot

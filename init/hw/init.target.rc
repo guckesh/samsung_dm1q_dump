@@ -72,26 +72,26 @@ on early-init
     write /proc/sys/kernel/printk_devkmsg ratelimited
     export MEMTAG_OPTIONS off
 
-    # foreground boost enable
-    mkdir /dev/cpuctl/foreground-boost/
+    # foreground-boost
+    mkdir /dev/cpuctl/foreground-boost
     chown system system /dev/cpuctl/foreground-boost
     chown system system /dev/cpuctl/foreground-boost/tasks
-    chown system system /dev/cpuctl/foreground-boost/cgroup.procs
     chmod 0664 /dev/cpuctl/foreground-boost/tasks
+    chown system system /dev/cpuctl/foreground-boost/cgroup.procs
     chmod 0664 /dev/cpuctl/foreground-boost/cgroup.procs
-
-    mkdir /dev/cpuset/foreground-boost
-    copy /dev/cpuset/cpus /dev/cpuset/foreground-boost/cpus
-    copy /dev/cpuset/mems /dev/cpuset/foreground-boost/mems
-
-    chown system system /dev/cpuset/foreground-boost
-    chown system system /dev/cpuset/foreground-boost/tasks
-    chown system system /dev/cpuset/foreground-boost/cgroup.procs
-    chmod 0664 /dev/cpuset/foreground-boost/tasks
-    chmod 0664 /dev/cpuset/foreground-boost/cgroup.procs
 
     # set property to boost-optimize
     setprop sys.perf.boostopt true
+
+    # midground set
+    mkdir /dev/cpuset/midground
+    copy /dev/cpuset/cpus /dev/cpuset/midground/cpus
+    copy /dev/cpuset/mems /dev/cpuset/midground/mems
+    chown root system /dev/cpuset/midground/cgroup.procs
+    chmod 0664 /dev/cpuset/midground/cgroup.procs
+    chown root system /dev/cpuset/midground/cpus
+    chmod 0664 /dev/cpuset/midground/cpus
+    write /dev/cpuset/midground/cpus 0-1,5-6
 
 on init
     wait /dev/block/platform/soc/${ro.boot.bootdevice}
@@ -100,12 +100,25 @@ on init
     chmod 0660 /sys/devices/platform/soc/1d84000.ufshc/auto_hibern8
     start logd
 
-    chown system system /dev/cpuset/foreground/cpus
-    chown system system /dev/cpuset/foreground-boost/cpus
-    chown system system /dev/cpuset/background/cpus
-    chmod 0664 /dev/cpuset/foreground/cpus
-    chmod 0664 /dev/cpuset/foreground-boost/cpus
-    chmod 0664 /dev/cpuset/background/cpus
+    mkdir /dev/cpuctl/general
+    copy_per_line /dev/cpuctl/tasks /dev/cpuctl/general/tasks
+    chown system system /dev/cpuctl/general
+    chown system system /dev/cpuctl/general/tasks
+    chmod 0644 /dev/cpuctl/general/tasks
+    chown system system /dev/cpuctl/general/cpu.shares
+    chmod 0644 /dev/cpuctl/general/cpu.shares
+
+    mkdir /dev/cpuset/foreground-boost
+    copy /dev/cpuset/cpus /dev/cpuset/foreground-boost/cpus
+    copy /dev/cpuset/mems /dev/cpuset/foreground-boost/mems
+    chown system system /dev/cpuset/foreground-boost
+    chown system system /dev/cpuset/foreground-boost/tasks
+    chmod 0664 /dev/cpuset/foreground-boost/tasks
+    chown system system /dev/cpuset/foreground-boost/cgroup.procs
+    chmod 0664 /dev/cpuset/foreground-boost/cgroup.procs
+
+    chown system system /dev/cpuset/restricted/cpus
+    chmod 0664 /dev/cpuset/restricted/cpus
 
 on early-fs
     start vold
@@ -116,17 +129,18 @@ on fs
     chown root system /mnt/vendor/persist
     chmod 0771 /mnt/vendor/persist
     restorecon_recursive /mnt/vendor/persist
+    mkdir /mnt/vendor/persist/secnvm 0770 system system
     mkdir /mnt/vendor/persist/data 0700 system system
 
-on property:ro.boot.product.vendor.sku=kalama
-    setprop ro.soc.model kalama
-
-on post-fs
+on post-fs && property:ro.boot.factory.interposer=0
+#    #Execute virtualization manager
+#    enable vendor.qvirtservice_rs
+#    start  vendor.qvirtservice_rs
     # set RLIMIT_MEMLOCK to 64MB
-    setrlimit 8 67108864 67108864
+     setrlimit 8 67108864 67108864
     #Execute virtualization manager
-    enable vendor.qvirtmgr
-    start  vendor.qvirtmgr
+     enable vendor.qvirtservice
+     start  vendor.qvirtservice 
 
 on late-fs
     wait_for_prop hwservicemanager.ready true
@@ -139,10 +153,10 @@ on post-fs-data
     write /sys/kernel/cnss/fs_ready 1
 
 on early-boot
-    start vendor.sensors
+    verity_update_state
 
 on boot
-    write /dev/cpuset/audio-app/cpus 1-2
+    write /dev/cpuset/audio-app/cpus 0-1
     # Add a cpuset for the camera daemon
     # We want all cores for camera
     mkdir /dev/cpuset/camera-daemon
@@ -159,16 +173,11 @@ on boot
     chown system /sys/devices/system/cpu/hyp_core_ctl/hcc_min_freq
 
     # set cpuset value by performance team
-    write /dev/cpuset/top-app/cpus 0-7
-    write /dev/cpuset/foreground/cpus 0-6
-    write /dev/cpuset/background/cpus 0-2
-    write /dev/cpuset/system-background/cpus 0-2
-    write /dev/cpuset/sf/cpus 0-6
-    write /dev/cpuset/foreground-boost 0-7
-    # write /dev/cpuset/restricted/cpus 0-2
-    # write /dev/cpuset/audio-app/cpus 0-3
+	write /dev/cpuset/foreground/cpus 0-6
+    write /dev/cpuset/foreground-boost/cpus 0-7
+    write /dev/cpuset/sf/cpus 0-1,5-6
 
-    # HyPer Permission
+# HyPer Permission
     chown root system /dev/cpuctl/top-app/cpu.uclamp.min
     chmod 0664 /dev/cpuctl/top-app/cpu.uclamp.min
     chown root system /sys/devices/system/cpu/bus_dcvs/DDR/memlat/adaptive_low_freq
@@ -178,16 +187,9 @@ on boot
     chown root system /sys/devices/system/cpu/bus_dcvs/DDR/soc:qcom,memlat:ddr:prime-latfloor/max_freq
     chmod 0664 /sys/devices/system/cpu/bus_dcvs/DDR/soc:qcom,memlat:ddr:prime-latfloor/max_freq
 
-    # Perfmond Atrace Buffer Size
-    setprop debug.perfmond.atrace.buffer 16384
-
-    # System Performance Restricted cpuset
-    chown root system dev/cpuset/restricted/cpus
-    chmod 0664 /dev/cpuset/restricted/cpus
-
 # For CDSP crash
 on property:ro.boot.debug_level=0x494d
-    setprop vendor.fastrpc.process.attrs 0x40000001
+    setprop vendor.fastrpc.process.attrs 1
     setprop vendor.fastrpc.debug.trace 1
 
 on property:vendor.display.lcd_density=560
@@ -231,10 +233,10 @@ service vendor.per_proxy /vendor/bin/pm-proxy
     group system
     disabled
 
-service vendor.mdm_helper /vendor/bin/mdm_helper
-    class core
-    group system wakelock
-    disabled
+#service vendor.mdm_helper /vendor/bin/mdm_helper
+#    class core
+#    group system wakelock
+#    disabled
 
 service vendor.mdm_launcher /vendor/bin/sh /vendor/bin/init.mdm.sh
     class core

@@ -13,8 +13,7 @@ on post-fs-data
     chmod 0640 /sys/wifi/softap
     chown wifi wifi /sys/wifi/memdump
     chmod 0644 /sys/wifi/memdump
-    symlink /data/vendor/ramdump /data/vendor/log/wifi/ramdump
-    chown system wifi /data/vendor/log/wifi/ramdump
+    mkdir /data/vendor/log/wifi/ramdump 0771 wifi system
 
     # for WIFI Antenna
     write /data/vendor/conn/.wificable.info E
@@ -22,7 +21,7 @@ on post-fs-data
     chmod 0666 /data/vendor/conn/.wificable.info
     chown wifi root /sys/wifi/wificable
     chmod 0664 /sys/wifi/wificable
-	
+
     # for WIFI TRP/TIS
     chown wifi wifi /data/vendor/conn/.psm.info
     chmod 0644 /data/vendor/conn/.psm.info
@@ -40,7 +39,7 @@ service vendor.cnss_dumpcollector /system/vendor/bin/cnss_dumpcollector
     user wifi
     group system wifi inet sdcard_rw media_rw
     oneshot
-	
+
 on property:vendor.wlan.ramdump_mode=0
 write /sys/kernel/cnss/recovery 1
 stop vendor.cnss_dumpcollector
@@ -66,6 +65,20 @@ on property:sys.boot_completed=1
     chmod 0644 /sys/module/kiwi_v2/parameters/con_mode
     chown wifi wifi /sys/module/qca6490/parameters/con_mode
     chmod 0644 /sys/module/qca6490/parameters/con_mode
+    chown wifi wifi /sys/module/qca_cld3_kiwi_v2/parameters/con_mode
+    chmod 0644 /sys/module/qca_cld3_kiwi_v2/parameters/con_mode
+
+on property:wifi.active.interface=wlan0 && property:ro.boot.debug_level=0x494d
+    write /sys/kernel/kiwi_v2/logging_config "4 2 12 1"
+
+on property:wifi.active.interface=wlan0 && property:ro.boot.debug_level=0x4948
+    write /sys/kernel/kiwi_v2/logging_config "4 2 12 1"
+
+on property:wifi.active.interface=swlan0 && property:ro.boot.debug_level=0x494d
+    write /sys/kernel/kiwi_v2/logging_config "4 2 12 1"
+
+on property:wifi.active.interface=swlan0 && property:ro.boot.debug_level=0x4948
+    write /sys/kernel/kiwi_v2/logging_config "4 2 12 1"
 
 on boot
 # for wlan FTM app
@@ -76,4 +89,3 @@ service ftm_ptt /system/bin/ftm_ptt -d
 
 on charger
     write /sys/kernel/cnss/charger_mode 1
-

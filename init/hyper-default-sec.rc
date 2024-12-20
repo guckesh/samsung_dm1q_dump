@@ -2,6 +2,7 @@ service vendor.samsung.hardware.hyper-default /vendor/bin/hw/vendor.samsung.hard
     class hal
     user system
     group system
+    capabilities SYS_NICE
 
 on property:init.svc.zygote=restarting
     restart vendor.samsung.hardware.hyper-default

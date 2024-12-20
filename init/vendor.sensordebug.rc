@@ -6,5 +6,27 @@ service vendor-sensordebug-sh /vendor/bin/init.vendor.sensordebug.sh
     oneshot
     disabled
 
+service start_sensor_ssr_dump /vendor/bin/init.vendor.sensordebug.ssr_dump.sh start
+    user root
+    group system shell
+    oneshot
+    disabled
+
+service stop_sensor_ssr_dump /vendor/bin/init.vendor.sensordebug.ssr_dump.sh complete
+    user root
+    group system shell
+    oneshot
+    disabled
+
+on late-fs
+    chown system system /sys/kernel/boot_adsp/check
+    write /sys/kernel/boot_adsp/check 0
+
 on property:sys.sensordebug_enable=true
     start vendor-sensordebug-sh
+
+on property:sec.sensor.ssr_dump=start
+    start start_sensor_ssr_dump
+
+on property:sec.sensor.ssr_dump=complete
+    write /sys/class/sensors/ssc_core/sns_crash 2
