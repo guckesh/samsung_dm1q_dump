@@ -1,14 +1,14 @@
-# dm1qxxx-user 15 AP3A.240905.015.A2 S911BXXS8DYDC release-keys
+# dm1qxxx-user 15 AP3A.240905.015.A2 S911BXXS8DYF2 release-keys
 - manufacturer: samsung
 - platform: kalama
 - codename: dm1q
 - flavor: dm1qxxx-user
 - release: 15
 - id: AP3A.240905.015.A2
-- incremental: S911BXXS8DYDC
+- incremental: S911BXXS8DYF2
 - tags: release-keys
-- fingerprint: samsung/dm1qxxx/dm1q:13/TP1A.220624.014/S911BXXS8DYDC:user/release-keys
+- fingerprint: samsung/dm1qxxx/dm1q:13/TP1A.220624.014/S911BXXS8DYF2:user/release-keys
 - is_ab: false
 - brand: samsung
-- branch: dm1qxxx-user-15-AP3A.240905.015.A2-S911BXXS8DYDC-release-keys
+- branch: dm1qxxx-user-15-AP3A.240905.015.A2-S911BXXS8DYF2-release-keys
 - repo: samsung_dm1q_dump
