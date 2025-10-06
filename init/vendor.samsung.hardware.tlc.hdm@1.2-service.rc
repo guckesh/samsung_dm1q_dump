@@ -1,6 +1,7 @@
-service hdmtlc-hal-service /vendor/bin/hw/vendor.samsung.hardware.tlc.hdm@1.1-service
+service hdmtlc-hal-service /vendor/bin/hw/vendor.samsung.hardware.tlc.hdm@1.2-service
     interface vendor.samsung.hardware.tlc.hdm@1.0::ISehHdm default
     interface vendor.samsung.hardware.tlc.hdm@1.1::ISehHdm default
+    interface vendor.samsung.hardware.tlc.hdm@1.2::ISehHdm default
     class hal
     user system
     group system
@@ -14,6 +15,8 @@ on post-fs-data
     mkdir /mnt/vendor/efs/HDM 0770 system system
     chown system system /sys/kernel/hdm_wlan_loader
     chmod 0660 /sys/kernel/hdm_wlan_loader
+    chown system system /sys/kernel/hdm_wpan_loader
+    chmod 0660 /sys/kernel/hdm_wpan_loader
 
 service hdm_status_sh /vendor/bin/sh /vendor/bin/hdm_status.sh ${ro.boot.hdm_status}
     user system
@@ -44,6 +47,9 @@ on property:vendor.hdm.internal.wlan=stop
 
 on property:vendor.hdm.internal.wlan=chown
     chown system system /sys/kernel/hdm_wlan_loader
+
+on property:vendor.hdm.internal.bt=chown
+    chown system system /sys/kernel/hdm_wpan_loader
 
 on property:vendor.hdm.internal.bt=boot
     stop vendor.bluetooth-1-1-qti
